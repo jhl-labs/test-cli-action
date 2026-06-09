@@ -1,0 +1,51 @@
+name: Smoke Test
+
+# Exercises the local action end to end by running it against the test-cli
+# repository (a real Go project with tests). Mirrors the security-cli-action
+# smoke test.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Run local action against jhl-labs/test-cli
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this action
+        uses: actions/checkout@v4
+
+      - name: Checkout test-cli (project under test)
+        uses: actions/checkout@v4
+        with:
+          repository: jhl-labs/test-cli
+          path: project
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: project/go.mod
+          cache: false   # test-cli has zero dependencies (no go.sum)
+
+      - name: Run local action
+        id: tests
+        uses: ./
+        with:
+          checkout: "false"
+          target: project
+          languages: go
+          profile: ci
+          fail-under: "0"
+
+      - name: Assert outputs are populated
+        run: |
+          echo "passed=${{ steps.tests.outputs.passed }}"
+          echo "tests-total=${{ steps.tests.outputs.tests-total }}"
+          echo "coverage-pct=${{ steps.tests.outputs.coverage-pct }}"
+          test "${{ steps.tests.outputs.tests-total }}" -gt 0
