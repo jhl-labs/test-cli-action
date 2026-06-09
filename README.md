@@ -16,10 +16,11 @@ machine-readable outputs for AI agents and downstream gates.
     fail-under: "80"
 ```
 
-The action installs the latest public `test-cli` binary through:
+The action installs the latest public `test-cli` binary through the
+Pages-hosted installer (with the raw script as a fallback):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jhl-labs/test-cli/main/scripts/install.sh | bash
+curl -fsSL https://jhl-labs.github.io/test-cli/install.sh | bash
 ```
 
 It then runs `test-cli run`, reads the normalized `report.json`, emits

@@ -116,8 +116,11 @@ runs:
         set -euo pipefail
         install_dir="${RUNNER_TEMP}/test-cli/bin"
         mkdir -p "${install_dir}"
-        curl -fsSL https://raw.githubusercontent.com/jhl-labs/test-cli/main/scripts/install.sh \
-          | INSTALL_DIR="${install_dir}" VERSION="${TEST_CLI_VERSION}" bash
+        # Prefer the Pages-hosted installer; fall back to the raw script.
+        primary="https://jhl-labs.github.io/test-cli/install.sh"
+        fallback="https://raw.githubusercontent.com/jhl-labs/test-cli/main/scripts/install.sh"
+        script="$(curl -fsSL "${primary}" || curl -fsSL "${fallback}")"
+        printf '%s' "${script}" | INSTALL_DIR="${install_dir}" VERSION="${TEST_CLI_VERSION}" bash
         echo "${install_dir}" >> "${GITHUB_PATH}"
         "${install_dir}/test-cli" --version
 
