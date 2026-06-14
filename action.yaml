@@ -178,7 +178,9 @@ runs:
             const out=process.env.GITHUB_OUTPUT;
             fs.appendFileSync(out, `tests-total=${s.total}\n`);
             fs.appendFileSync(out, `tests-failed=${s.failed+s.errors}\n`);
-            fs.appendFileSync(out, `coverage-pct=${c.pct.toFixed(1)}\n`);
+            if (Number(c.total) > 0 && Number.isFinite(Number(c.pct))) {
+              fs.appendFileSync(out, `coverage-pct=${Number(c.pct).toFixed(1)}\n`);
+            }
           ' "${report}"
         fi
         exit 0
